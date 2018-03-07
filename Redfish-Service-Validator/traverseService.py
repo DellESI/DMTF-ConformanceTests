@@ -30,7 +30,11 @@ proxies = {'http': None, 'https': None}
 
 currentSession = rfSession()
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
- 
+
+# dictionary to hold sampling notation strings for URIs
+uri_sample_map = dict()
+
+
 def getLogger():
     """
     Grab logger for tools that might use this lib
@@ -982,11 +986,20 @@ def enumerate_collection(items, cTypeName, linklimits, sample_size):
         limit = min(linklimits[cTypeName], len(items))
         traverseLogger.debug('Limiting "{}" to first {} links'.format(cTypeName, limit))
         for i in range(limit):
+            if linklimits[cTypeName] < len(items):
+                uri = items[i].get('@odata.id')
+                if uri is not None:
+                    uri_sample_map[uri] = 'Collection limit {} of {}'.format(i + 1, limit)
             yield i, items[i]
     elif 0 < sample_size < len(items):
         # "sample size" case
         traverseLogger.debug('Limiting "{}" to sample of {} links'.format(cTypeName, sample_size))
+        sample = 0
         for i in sorted(random.sample(range(len(items)), sample_size)):
+            sample += 1
+            uri = items[i].get('@odata.id')
+            if uri is not None:
+                uri_sample_map[uri] = 'Collection sample {} of {}'.format(sample, sample_size)
             yield i, items[i]
     else:
         # "all" case
@@ -1055,17 +1068,18 @@ def getAllLinks(jsonData, propList, refDict, prefix='', context='', linklimits=N
             elif item == 'Uri' and ownerNS == 'MessageRegistryFile' and ownerType == 'Location':
                 # special handling for MessageRegistryFile Location Uri
                 insideItem = jsonData.get(item)
-                uriItem = {'@odata.id': insideItem}
-                cType = ownerNS + '.' + ownerNS
-                autoExpand = propDict.get('OData.AutoExpand', None) is not None or \
-                             propDict.get('OData.AutoExpand'.lower(), None) is not None
-                cSchema = refDict.get(getNamespace(cType), (None, None))[1]
-                if cSchema is None:
-                    cSchema = context
-                traverseLogger.debug('Registry Location Uri: resource = {}, type = {}, schema = {}'
-                                     .format(insideItem, cType, cSchema))
-                linkList[prefix + str(item) + '.' + getType(propDict['attrs']['Name'])] = (
-                    uriItem.get('@odata.id'), autoExpand, cType, cSchema, uriItem)
+                if insideItem is not None and isinstance(insideItem, str) and len(insideItem) > 0:
+                    uriItem = {'@odata.id': insideItem}
+                    cType = ownerNS + '.' + ownerNS
+                    autoExpand = propDict.get('OData.AutoExpand', None) is not None or \
+                                 propDict.get('OData.AutoExpand'.lower(), None) is not None
+                    cSchema = refDict.get(getNamespace(cType), (None, None))[1]
+                    if cSchema is None:
+                        cSchema = context
+                    traverseLogger.debug('Registry Location Uri: resource = {}, type = {}, schema = {}'
+                                         .format(insideItem, cType, cSchema))
+                    linkList[prefix + str(item) + '.' + getType(propDict['attrs']['Name'])] = (
+                        uriItem.get('@odata.id'), autoExpand, cType, cSchema, uriItem)
         for propx in propList:
             propDict = propx.propDict
             key = propx.name
