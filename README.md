@@ -55,6 +55,7 @@ the --schemadir option. You can download the schemas with the getSchemas.py util
 
 cd ~/DMTF-ConformanceTests/Redfish-Service-Validator
 python3 RedfishServiceValidator.py --ip localhost -u root -p calvin --nochkcert --authtype Basic --nooemcheck --schemadir ~/schemas --linklimit 20 2>&1|tee  yourlogname
+NOTE: The --nooemcheck option should be used until we solve the Intel Oem problem.
 
 ---------------------------
 This is a very comprehensive set of tests which will eventually cover all of the Redfish standard
