@@ -1,0 +1,29 @@
+Redfish-Service-Conformance-Check/rfs_test/TEST_accountservice_schema.py
+   createDummyAccount needs try except
+    try:
+        uri = relative_uris['Root Service_AccountService_Accounts']
+    except:
+        print ('Root Service_AccountService_Accounts not in relative_uris')
+        return
+------------------------------
+WHAT IS THIS?
+    for i in range(0, AccountLockoutThreshold):
+        if not failAuthorization(self):
+            assertion_status = log.WARN
+            log.assertion_log('line', "~  Could not fail the authorization")
+            return assertion_status
+  File "/home/dmtf/Redfish-Service-Conformance-Check/rfs_test/TEST_accountservice_schema.py", line 347, in Assertion_ACCO105
+    for i in range(0, AccountLockoutThreshold):
+NameError: name 'AccountLockoutThreshold' is not defined
+------------------------------
+/home/dmtf/Redfish-Service-Conformance-Check/rfs_test/TEST_actioninfo_schema.py
+    Assertion_ACTI104
+THIS EXCEPTION NEEDS AN EXCEPTION
+       assertion_status = log.WARN
+        log.assertion_log('line', "Resource %s, is not found." % (relative_uris['Root Service_Systems']))
+        return assertion_status
+ line 53, in Assertion_ACTI104
+    log.assertion_log('line', "Resource %s, is not found." % (relative_uris['Root Service_Systems']))
+------------------------------
+
+
