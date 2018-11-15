@@ -1,5 +1,46 @@
 # Change Log
 
+## [1.1.4] - 2018-09-28
+- Added new tests ManagerAccount, ComputerSystem, AccountService, Assembly, and ActionInfo based on the long descriptions in their respective schema files
+
+## [1.1.3] - 2018-09-07
+- Added new logging functionality to show the test results in a web browser
+
+## [1.1.2] - 2018-08-03
+- Added checking for presence of an action before trying to test the action
+
+## [1.1.1] - 2018-07-16
+- Added caching mechanism to allow for reuse of responses in different tests
+- Reduced the sample size of URIs performed in each test to have the tool run to completion in a shorter amount of time
+
+## [1.1.0] - 2018-07-06
+- Added change to use a higher level of TLS
+- Changed default password used for test cases
+- Fixes to tests that check for resource changes after a PATCH
+
+## [1.0.9] - 2018-06-01
+- Updated schema bundle to use the 2018.1 release
+
+## [1.0.8] - 2018-05-04
+- Fixed schema download to use a zip file instead of downloading them individually
+
+## [1.0.7] - 2018-04-27
+- Made fix to allow for the Oem property to be inside of Actions
+
+## [1.0.6] - 2018-04-13
+- Added type checking of responses to ensure they're JSON objects
+
+## [1.0.5] - 2018-03-16
+- Fixed test cases that validated redirect handling
+- Corrected primitive type checking done in schemas
+
+## [1.0.4] - 2018-03-09
+- Fixed bug where it was not able to handle multiple properties of the same name in different objects in the same payload
+- Fixed bug where the members of a collection were not being handled properly when validating the usage of `@odata.nextLink`
+- Fixed test cases where it was validating the response of an Action, but not handling corner cases appropriately
+- Corrected check for the HEAD method; this is not required to be supported on a service
+- Corrected Allow header check; this is only mandatory when the HTTP status code is 405
+
 ## [1.0.3] - 2018-03-02
 - Corrected the enforcement of the Allow header on GET requests
 - Hardened the validation of error responses

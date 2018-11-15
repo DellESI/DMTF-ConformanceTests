@@ -1,6 +1,6 @@
 # Copyright Notice:
-# Copyright 2016-2017 Distributed Management Task Force, Inc. All rights reserved.
-# License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/Redfish-Service-Conformance-Check/LICENSE.md
+# Copyright 2016-2017 DMTF. All rights reserved.
+# License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/Redfish-Service-Conformance-Check/blob/master/LICENSE.md
 
 ###################################################################################################
 # File: rf_utility.py
@@ -20,6 +20,8 @@ import sys
 from schema import SchemaModel
 import rf_utility
 from collections import OrderedDict
+import os.path
+import random
 
 # map python 2 vs 3 imports
 if (sys.version_info < (3, 0)):
@@ -51,7 +53,6 @@ import gzip
 from xml.etree import ElementTree as ET
 import os
 import zipfile
-
 
 ###################################################################################################
 # Class: SUT                                            
@@ -119,6 +120,10 @@ class SUT():
         self.json_directory = None
         self.xml_directory = None
 
+        # holds cached URIs
+        self.uris = []
+        self.uris_no_members = []
+
     ###############################################################################################
     # Name: self.request_headers()                                                
     #   returns a request header dictionary used globally throughout rfs_check.py thru base
@@ -126,6 +131,71 @@ class SUT():
     ###############################################################################################
     def request_headers(self): 
         return rf_utility.create_request_headers()
+
+    def get_and_cache_uris(self, relative_uris, k, payload):
+        authorization = 'on'
+        rq_headers = self.request_headers()
+        uris = []
+        k = min(k, len(relative_uris))
+        if k <= 0:
+            k = len(relative_uris)  # cache all the URIs
+        sample_keys = random.sample(relative_uris.keys(), k)
+        for key in sample_keys:
+            json_payload, headers, status = self.http_GET(
+                relative_uris[key], rq_headers, authorization)
+            if status == rf_utility.HTTP_OK and isinstance(json_payload, dict) and isinstance(headers, dict):
+                payload[relative_uris[key]] = json_payload
+                payload[relative_uris[key] + '_header'] = headers
+                payload[relative_uris[key] + '_status'] = status
+                uris.append(key)
+            else:
+                print('Error retrieving URI {} - status {}, JSON payload type {}, headers type {}'
+                      .format(relative_uris[key], status, type(json_payload), type(headers)))
+        return uris
+
+    ###################################################################################
+    # Name: initialize_cache(self)
+    #   Returns a list of URI's cached by the http GET requests for Redfish API 
+    # Returns:
+    #   - URI's list: Cached URI's List                                                
+    ###################################################################################
+    def initialize_cache(self):
+        try:
+            # default is zero, meaning cache all the URIs
+            num_uris = int(self.SUT_prop.get('NumUrisToCache', "0"))
+        except:
+            num_uris = 0
+        print('Getting {} URIs to sample and cache'.format("all" if num_uris <= 0 else num_uris))
+        relative_uris = self.relative_uris
+        relative_uris_no_members = self.relative_uris_no_members
+        cache_payload = {}
+        with open('cache_uri_data.json', 'w') as fp:
+            self.uris = self.get_and_cache_uris(relative_uris, num_uris, cache_payload)
+            self.uris_no_members = self.get_and_cache_uris(relative_uris_no_members, num_uris, cache_payload)
+            json.dump(cache_payload, fp, sort_keys=True, indent=4)
+        print('')
+        
+    ###############################################################################################
+    # Name: http_cached_GET(resource_uri, rq_headers, auth_on_off)                                              
+    #   Returns a cached GET request of the Redfish API 
+    #   Takes resource uri, request header dict, and authorization 'on' or 'off' option
+    # Returns:
+    #   - Response json_payload dict or string depending on 'content-type' in request header. If
+    #       'application/json' then json_payload will be a dict. 
+    #   - Response Headers dict: header keys in lower case
+    #   - Response Status code: http status code returned from the request                                                 
+    ###############################################################################################
+    def http_cached_GET(self, relative_uri, rq_headers, auth_on_off):      
+        cache = {} 
+        with open('cache_uri_data.json', 'r') as fp:
+            cache = json.load(fp)
+        try:
+            return cache[relative_uri], cache[relative_uri+'_header'], cache[relative_uri+'_status']
+        except:
+            return self.http_GET(relative_uri, rq_headers, auth_on_off)
+    #
+    ## end http_GET
+
 
     ###############################################################################################
     # Name: http_GET(resource_uri, rq_headers, auth_on_off)                                              
@@ -478,10 +548,27 @@ class SUT():
     #   the service root to retrieve all the @odata.ids from the json_payload of each resource
     ###############################################################################################
     def collect_relative_uris(self, service_root):
-        #start with rest/v1/
-        self.relative_uris['Root Service'] = service_root
-        self.relative_uris_no_members['Root Service'] = service_root
-        self.process_uri(service_root, 'Root Service')
+        if os.path.isfile('data_rel_no_mem.json') and os.path.isfile('data_rel.json'):   
+
+            with open('data_rel_no_mem.json', 'r') as rel_no:
+                self.relative_uris_no_members = json.load(rel_no)
+            
+            with open('data_rel.json', 'r') as rel:
+                self.relative_uris = json.load(rel)
+
+        else:
+            #start with rest/v1/
+            self.relative_uris['Root Service'] = service_root
+            self.relative_uris_no_members['Root Service'] = service_root
+
+            self.process_uri(service_root, 'Root Service')
+
+           
+            with open('data_rel_no_mem.json', 'w') as fp:
+                json.dump(self.relative_uris_no_members, fp, sort_keys=True, indent=4)
+            
+            with open('data_rel.json', 'w') as fp:
+                json.dump(self.relative_uris, fp, sort_keys=True, indent=4)
 
     ###############################################################################################
     # Name: process_uri(url, nested_key = None)
