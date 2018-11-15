@@ -1,0 +1,54 @@
+{
+    "/redfish/v1/": {
+        "@odata.context": "/redfish/v1/$metadata#ServiceRoot.ServiceRoot",
+        "@odata.id": "/redfish/v1/",
+        "@odata.type": "#ServiceRoot.v1_1_3.ServiceRoot",
+        "AccountService": {
+            "@odata.id": "/redfish/v1/AccountService"
+        },
+        "Chassis": {
+            "@odata.id": "/redfish/v1/Chassis"
+        },
+        "Description": "Redfish RootService",
+        "EventService": {
+            "@odata.id": "/redfish/v1/EventService"
+        },
+        "Id": "RootService",
+        "JsonSchemas": {
+            "@odata.id": "/redfish/v1/JsonSchemas"
+        },
+        "Links": {
+            "Sessions": {
+                "@odata.id": "/redfish/v1/SessionService/Sessions"
+            }
+        },
+        "Managers": {
+            "@odata.id": "/redfish/v1/Managers"
+        },
+        "Name": "Root Service",
+        "Oem": {},
+        "RedfishVersion": "1.0.0",
+        "Registries": {
+            "@odata.id": "/redfish/v1/Registries"
+        },
+        "SessionService": {
+            "@odata.id": "/redfish/v1/SessionService"
+        },
+        "Systems": {
+            "@odata.id": "/redfish/v1/Systems"
+        },
+        "UUID": "e3af719e-8230-4ffb-a09a-0584b0b660ad"
+    },
+    "/redfish/v1/_header": {
+        "access-control-allow-origin": "*",
+        "allow": "GET,HEAD",
+        "cache-control": "no-store",
+        "content-length": "1060",
+        "content-type": "application/json;odata.metadata=minimal;charset=utf-8",
+        "date": "Mon, 08 Oct 2018 18:04:55 GMT",
+        "link": "<http://redfish.dmtf.org/schemas/v1/ServiceRoot.v1_1_3.json>;rel=describedby",
+        "odata-version": "4.0",
+        "server": "Werkzeug/0.12.2 Python/3.4.5"
+    },
+    "/redfish/v1/_status": 200
+}

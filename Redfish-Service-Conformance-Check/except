@@ -1,0 +1,17 @@
+rfs_test/TEST_accountservice_schema.py
+
+def createDummyAccount(self):
+    authorization = 'on'
+    rq_headers = self.request_headers()
+    relative_uris = self.relative_uris
+    rq_body = {
+        'UserName': 'test_id',
+        'Password': 'test_pswd',
+        'RoleId': 'Administrator'
+    }
+
+    try:
+        uri =  relative_uris['Root Service_AccountService_Accounts']
+    except:
+        print ('Root Service_AccountService_Accounts not in relative_uris')
+

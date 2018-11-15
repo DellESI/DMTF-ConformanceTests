@@ -1,0 +1,16 @@
+Assertion: 6.4.2.3
+~ GET: /redfish/v1/ HTTP status 200:OK with request header: OData-Version and incorrect value: 3.0 passed, which is an unexpected behavior
+Assertion Description: b'\nOData-Version\nYes\n4.0\nServices shall reject requests which specify an unsupported OData version.\n'
+<--- Assertion 6.4.2.3: FAIL
+ >>>> from request AND response header  'OData-Version': '4.0',
+ >>>> What's wrong with 4.0?
+--------------------------------
+---> Assertion: 6.4.26
+status from POST is 405
+~ POST:/redfish/v1/SessionService/Sessions/Members failed : HTTP status 405:Method Not Allowed, Expected statuses: [200, 201, 202, 204]
+Assertion Description: b'Submitting a POST request to a resource representing a collection is equivalent to submitting the same request to the Members property of that resource. Services that support adding members to a collection shall support both forms.'
+<--- Assertion 6.4.26: FAIL
+>>>> ?????
+>>>> Sessions allows POST and Members is empty
+>>>> so what does this FAIL mean?
+-----------------------------------

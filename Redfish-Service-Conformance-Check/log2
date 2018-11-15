@@ -1,0 +1,17 @@
+Setting up Redfish Service Check Tool Revision: 01.05.17 : :localhost
+~ GET for resource /redfish failed: FAIL (HTTP status 503)
+Protocol version and Service Root uri could not be retrieved through '/redfish', assuming spec mandated values
+~ GET for resource /redfish/v1/odata failed: FAIL (HTTP status 503)
+line ~ GET for resource /redfish/v1/ failed: FAIL (HTTP status 503)
+Traceback (most recent call last):
+  File "rf_client.py", line 702, in <module>
+    main()
+  File "rf_client.py", line 692, in main
+    sut = setup_tool(sut_prop)
+  File "rf_client.py", line 674, in setup_tool
+    if setup_sut_obj(sut):
+  File "rf_client.py", line 617, in setup_sut_obj
+    sr_toplevel_uris = sut.parse_serviceroot_toplevel_uris(sut.Redfish_URIs['Service_Root'])
+  File "/home/dmtf/Redfish-Service-Conformance-Check/rf_sut.py", line 481, in parse_serviceroot_toplevel_uris
+    return toplevel_uris
+UnboundLocalError: local variable 'toplevel_uris' referenced before assignment
